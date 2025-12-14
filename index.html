@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mason Ledger</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: #000;
+      color: #fff;
+    }
+
+    .container {
+      max-width: 680px;
+      margin: 120px auto;
+      padding: 24px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 12px;
+    }
+
+    p {
+      color: #b5b5b5;
+      margin-bottom: 40px;
+    }
+
+    .field {
+      margin-bottom: 22px;
+      text-align: left;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .dropdown {
+      position: relative;
+    }
+
+    .trigger {
+      width: 100%;
+      padding: 14px;
+      background: #000;
+      border: 1px solid rgba(255,255,255,.2);
+      color: #fff;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .menu {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: #000;
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 10px;
+      overflow: hidden;
+      display: none;
+      z-index: 10;
+    }
+
+    .dropdown.open .menu {
+      display: block;
+    }
+
+    .item {
+      padding: 12px 14px;
+      cursor: pointer;
+    }
+
+    .item:hover {
+      background: rgba(212,175,55,.15);
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      background: #000;
+      border: 1px solid rgba(255,255,255,.2);
+      color: #fff;
+      border-radius: 10px;
+    }
+
+    button {
+      margin-top: 30px;
+      padding: 16px;
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #d4af37, #b8962e);
+      font-weight: 700;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>Mason Ledger</h1>
+  <p>Private application intake</p>
+
+  <!-- EXPERIENCE -->
+  <div class="field">
+    <label>Crypto Experience</label>
+    <div class="dropdown" data-type="experience">
+      <div class="trigger">Select experience</div>
+      <div class="menu">
+        <div class="item">0 months</div>
+        <div class="item">3 months</div>
+        <div class="item">6 months</div>
+        <div class="item">9 months</div>
+        <div class="item">1 year+</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PORTFOLIO -->
+  <div class="field">
+    <label>Portfolio Size</label>
+    <div class="dropdown" data-type="portfolio">
+      <div class="trigger">Select portfolio</div>
+      <div class="menu">
+        <div class="item">$5,000–$10,000</div>
+        <div class="item">$10,000–$20,000</div>
+        <div class="item">$20,000–$30,000</div>
+        <div class="item">$30,000+</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTACT -->
+  <div class="field">
+    <label>Telegram or Email</label>
+    <input id="contact" placeholder="@username or email" />
+  </div>
+
+  <button onclick="submitSurvey()">Submit Application</button>
+</div>
+
+<script>
+let experience = "";
+let portfolio = "";
+
+document.querySelectorAll(".dropdown").forEach(dropdown => {
+  const trigger = dropdown.querySelector(".trigger");
+  trigger.onclick = () => dropdown.classList.toggle("open");
+
+  dropdown.querySelectorAll(".item").forEach(item => {
+    item.onclick = () => {
+      trigger.innerText = item.innerText;
+      dropdown.classList.remove("open");
+
+      if (dropdown.dataset.type === "experience") {
+        experience = item.innerText;
+      } else {
+        portfolio = item.innerText;
+      }
+    };
+  });
+});
+
+async function submitSurvey() {
+  const contact = document.getElementById("contact").value.trim();
+
+  if (!experience || !portfolio || !contact) {
+    alert("Please complete all fields.");
+    return;
+  }
+
+  const res = await fetch("/api/apply", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ experience, portfolio, contact })
+  });
+
+  const data = await res.json();
+
+  if (data.success) {
+    alert("Application submitted.");
+  } else {
+    alert("Submission failed.");
+  }
+}
+</script>
+
+</body>
+</html>
